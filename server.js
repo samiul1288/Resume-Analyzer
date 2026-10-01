@@ -379,6 +379,8 @@ async function run() {
   const client = new MongoClient(uri, {
     connectTimeoutMS: MONGO_TIMEOUT_MS,
     serverSelectionTimeoutMS: MONGO_TIMEOUT_MS,
+    tls: true,
+    tlsInsecure: false,
   });
 
   await client.connect();
