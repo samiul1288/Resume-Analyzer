@@ -1,0 +1,32 @@
+{
+  "name": "resume-analyzer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Resume Analysis web app: scores a resume, diffs it against a job description, and returns prioritized, actionable feedback.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test",
+    "smoke": "node scripts/api-smoke.js",
+    "preview": "node scripts/preview.js",
+    "analyze:cli": "node bin/analyze.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "resume",
+    "ats",
+    "analyzer",
+    "hiring"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^18.0.5",
+    "firebase": "^12.19.0",
+    "mammoth": "^1.13.0",
+    "mongodb": "^7.7.0",
+    "pdf-parse": "^2.4.5"
+  }
+}

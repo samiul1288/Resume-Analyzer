@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Analyzer - score, keywords &amp; fixes</title>
+    <meta
+      name="description"
+      content="Upload or paste a resume, compare it to a job description, and get a 0-100 score with missing keywords, strengths and actionable fixes."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content="#e9edf8"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#070a16"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%84%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script>
+      /* Resolve the theme before first paint so the glass never flashes the wrong tint. */
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("ra-theme");
+        } catch (e) {
+          stored = null;
+        }
+        var theme = stored === "dark" || stored === "light" ? stored : "dark";
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="aurora" aria-hidden="true">
+      <span class="blob b1"></span>
+      <span class="blob b2"></span>
+      <span class="blob b3"></span>
+    </div>
+
+    <a class="skip-link" href="#results">Skip to results</a>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">RA</span>
+          <div>
+            <h1>Resume Analyzer</h1>
+            <p class="brand-tag">
+              Score your resume, match it to a job post, and fix what recruiters
+              and ATS filters miss.
+            </p>
+          </div>
+        </div>
+        <div class="header-tools">
+          <div class="engine-status" id="engine-status" aria-live="polite">
+            <span class="dot"></span> connecting to analyzer&hellip;
+          </div>
+          <button
+            type="button"
+            class="theme-toggle"
+            id="theme-toggle"
+            aria-pressed="false"
+            aria-label="Switch colour theme"
+            title="Switch colour theme"
+          >
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+            </svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path
+                d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="account-tools" id="account-tools" hidden>
+          <span class="account-email" id="account-email"></span>
+          <output class="account-message" id="account-message" hidden></output>
+          <button
+            type="button"
+            class="btn ghost small"
+            id="sign-out-btn"
+            aria-label="Sign out"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section
+      class="auth-shell wrap"
+      id="auth-shell"
+      aria-labelledby="auth-title"
+    >
+      <div class="auth-panel">
+        <div class="auth-intro">
+          <span class="auth-kicker">RESUME ANALYZER</span>
+          <h2 id="auth-title">Make your next move count.</h2>
+          <p>Sign in to continue to your resume workspace.</p>
+          <div class="auth-orbit" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="auth-form-wrap">
+          <div class="auth-heading">
+            <h3 id="auth-form-title">Welcome back</h3>
+            <p id="auth-form-description">
+              Use your email and password to sign in.
+            </p>
+          </div>
+          <div class="auth-switch" role="tablist" aria-label="Account access">
+            <button
+              class="auth-tab is-active"
+              id="auth-login-tab"
+              type="button"
+              role="tab"
+              aria-selected="true"
+            >
+              Sign in
+            </button>
+            <button
+              class="auth-tab"
+              id="auth-register-tab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+            >
+              Create account
+            </button>
+          </div>
+          <form id="auth-form" class="auth-form">
+            <label id="auth-name-field" class="auth-field" hidden>
+              <span>Your name</span>
+              <input
+                id="auth-name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                maxlength="80"
+              />
+            </label>
+            <label class="auth-field">
+              <span>Email address</span>
+              <input
+                id="auth-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+              />
+            </label>
+            <label class="auth-field">
+              <span>Password</span>
+              <input
+                id="auth-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                minlength="6"
+                required
+              />
+            </label>
+            <output id="auth-message" class="auth-message" hidden></output>
+            <button
+              class="btn primary auth-submit"
+              id="auth-submit"
+              type="submit"
+            >
+              <span class="spinner" hidden></span
+              ><span id="auth-submit-label">Sign in</span>
+            </button>
+          </form>
+          <p class="auth-privacy">Your resume stays in your workspace.</p>
+        </div>
+      </div>
+    </section>
+
+    <main class="wrap" id="analyzer-app" hidden>
+      <section class="panel-grid" aria-label="Resume and job description input">
+        <!-- ------------------------- Resume input ------------------------- -->
+        <article class="card">
+          <header class="card-head">
+            <div>
+              <h2>1. Your resume</h2>
+              <p class="hint">
+                Upload a PDF/DOCX, or paste the text.
+                <span class="req">Required</span>
+              </p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Resume input method">
+              <button
+                class="tab is-active"
+                id="tab-upload"
+                role="tab"
+                aria-selected="true"
+                aria-controls="pane-upload"
+                type="button"
+              >
+                Upload
+              </button>
+              <button
+                class="tab"
+                id="tab-paste"
+                role="tab"
+                aria-selected="false"
+                aria-controls="pane-paste"
+                type="button"
+              >
+                Paste
+              </button>
+            </div>
+          </header>
+
+          <div
+            class="pane"
+            id="pane-upload"
+            role="tabpanel"
+            aria-labelledby="tab-upload"
+          >
+            <label class="dropzone" id="dropzone" for="file-input" tabindex="0">
+              <input
+                type="file"
+                id="file-input"
+                accept=".pdf,.docx,.txt,.md,.rtf"
+                hidden
+              />
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="dz-icon">
+                <path
+                  d="M12 16V4m0 0L8 8m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+                />
+              </svg>
+              <strong>Drop your resume here</strong>
+              <span class="dz-sub"
+                >or click to browse &middot; PDF, DOCX, TXT, RTF &middot; max
+                15&nbsp;MB</span
+              >
+            </label>
+            <div id="file-chip" class="file-chip" hidden>
+              <span class="file-icon" aria-hidden="true">&#128196;</span>
+              <div class="file-meta">
+                <strong id="file-name"></strong>
+                <span id="file-info" class="hint"></span>
+              </div>
+              <button type="button" class="btn ghost small" id="file-clear">
+                Remove
+              </button>
+            </div>
+            <div class="callout" id="extract-note" hidden></div>
+          </div>
+
+          <div
+            class="pane"
+            id="pane-paste"
+            role="tabpanel"
+            aria-labelledby="tab-paste"
+            hidden
+          >
+            <textarea
+              id="resume-text"
+              class="input-area"
+              rows="12"
+              placeholder="Paste the full resume text here - header, summary, experience bullets, skills, education..."
+            ></textarea>
+            <div class="row-between">
+              <span class="hint" id="resume-count">0 words</span>
+              <button type="button" class="btn ghost small" id="resume-clear">
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <details class="preview-details" id="preview-wrap" hidden>
+            <summary>Text we read from your file</summary>
+            <pre id="text-preview" class="preview"></pre>
+          </details>
+        </article>
+
+        <!-- ---------------------- Job description ---------------------- -->
+        <article class="card">
+          <header class="card-head">
+            <div>
+              <h2>2. Job description</h2>
+              <p class="hint">
+                Optional, but it unlocks the keyword-match score.
+                <span class="badge-soft">Recommended</span>
+              </p>
+            </div>
+          </header>
+          <textarea
+            id="job-text"
+            class="input-area"
+            rows="14"
+            placeholder="Paste the job posting: responsibilities, requirements, nice-to-haves..."
+          ></textarea>
+          <div class="row-between">
+            <span class="hint" id="job-count">0 words</span>
+            <button type="button" class="btn ghost small" id="job-clear">
+              Clear
+            </button>
+          </div>
+          <div class="samples">
+            <span class="hint">Try a sample:</span>
+            <div class="chip-row" id="sample-chips"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="actions" aria-label="Analyze controls">
+        <button type="button" class="btn primary large" id="analyze-btn">
+          <span class="spinner" hidden></span>
+          <span id="analyze-label">Analyze Resume</span>
+        </button>
+        <button type="button" class="btn ghost" id="reset-btn">Reset</button>
+        <span class="hint" id="action-hint"
+          >Nothing leaves your machine - analysis runs on your local
+          server.</span
+        >
+      </section>
+
+      <div class="alert" id="alert" role="alert" hidden></div>
+
+      <!-- ---------------------------- Results ---------------------------- -->
+      <section id="results" class="results" hidden aria-live="polite"></section>
+    </main>
+
+    <footer class="site-footer" id="site-footer" hidden>
+      <div class="wrap">
+        <p>
+          Deterministic, offline scoring engine &middot; no resume data is sent
+          to third parties.
+        </p>
+        <p class="hint">
+          Scores are guidance based on measurable signals in your text, not a
+          hiring decision.
+        </p>
+      </div>
+    </footer>
+
+    <script src="/extractor.js"></script>
+    <script src="/app.js"></script>
+    <script type="module" src="/auth.js"></script>
+  </body>
+</html>
