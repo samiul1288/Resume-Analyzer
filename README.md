@@ -1,87 +1,8 @@
-# Resume Analyzer
+# 📄 AI Resume Analyzer
 
-Upload or paste a resume, optionally paste the job description, and get a **0-100 score** with
-per-category breakdown, missing keywords, strengths, prioritized fixes and before/after rewrites.
+An intelligent web application that analyzes resumes, extracts key information, and provides data-driven insights. Built with Node.js, Express, MongoDB, and deployed seamlessly on Vercel.
 
-Scoring runs locally - no paid AI API is involved. The server does connect to two platform
-services at boot (Firebase and MongoDB Atlas) and **refuses to start unless both are live**, so
-a half-configured instance can never serve partial data.
-
----
-
-## Quick start
-
-```bash
-cd "D:\hunter-web\3.2\resume-analyzer"
-npm install                    # pdf-parse + mammoth (extractors) + dotenv, mongodb, firebase
-copy .env.example .env         # then fill in your Firebase + MongoDB Atlas credentials
-npm start                      # http://127.0.0.1:5173
-```
-
-Boot is strict: dotenv -> Firebase -> MongoDB Atlas -> HTTP listener. A missing variable or an
-unreachable Atlas aborts startup with exit code 1 instead of opening the port:
-
-```
-  Resume Analyzer failed to start: missing required environment variables: MONGO_URI, FIREBASE_API_KEY, ...
-    Copy .env.example to .env and fill in your Firebase + MongoDB Atlas credentials.
-```
-
-Then open **http://127.0.0.1:5173** and either:
-
-1. drag a **PDF / DOCX / TXT / RTF** resume onto the drop zone, or
-2. switch to **Paste** and paste the resume text,
-3. optionally paste the **job description** (unlocks the keyword-match score),
-4. press **Analyze Resume**.
-
-Click **Try a sample** chip to load a bundled example (a weak frontend resume and a strong data-analyst resume) and see the difference in scoring immediately.
-
-Useful scripts:
-
-| Command                                                   | What it does                                                                                                                                     |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm start`                                               | run the web app (port 5173, override with `PORT=8080 npm start`)                                                                                 |
-| `npm run dev`                                             | same, with `node --watch` auto-restart                                                                                                           |
-| `npm run preview`                                         | start the server in the background, wait until it answers, print the URL (refuses to try while `.env` is incomplete)                             |
-| `npm test`                                                | 38 unit tests (engine, extractors, UI contracts, service + env wiring)                                                                           |
-| `npm run smoke`                                           | boots a server on port 5188 and exercises every API route; skips with instructions if `.env` is missing, or point `BASE_URL` at a running server |
-| `npm run analyze:cli -- --sample frontend-junior`         | pretty console report, no browser                                                                                                                |
-| `npm run analyze:cli -- resume.pdf job.txt`               | analyze real files from the terminal                                                                                                             |
-| `npm run analyze:cli -- --json resume.docx > report.json` | machine-readable report                                                                                                                          |
-
----
-
-## Project structure
-
-```
-resume-analyzer/
-├── server.js                 # entry file: dotenv + Firebase + Atlas bootstrap, static files + JSON API
-├── .env.example              # every variable the server reads (copy to .env; .env stays git-ignored)
-├── package.json
-├── bin/analyze.js            # CLI report generator
-├── public/                   # frontend (no framework, no build step)
-│   ├── index.html
-│   ├── styles.css            # design tokens + responsive layout + print styles
-│   ├── app.js                # UI state, fetch calls, report rendering
-│   └── extractor.js          # browser fallback: pdf.js / mammoth from CDN
-├── src/
-│   ├── analyzer.js           # public API: analyze(resumeText, jobText, opts)
-│   ├── parse.js              # resume parsing: sections, contact, bullets, stats
-│   ├── score.js              # weighted scoring model (6 categories)
-│   ├── suggest.js            # prioritized, actionable fixes
-│   ├── strengths.js          # what is already working
-│   ├── narrative.js          # job-description analysis, ATS checks, bullet rewrites
-│   ├── dictionary.js         # alias-aware skill matching, role detection
-│   ├── skills.js             # ~600 skill keywords in 12 groups
-│   ├── roles.js              # 15 role profiles (match words, categories, must-haves)
-│   ├── lexicon.js            # action verbs, weak phrases, buzzwords, headings
-│   ├── text.js               # normalization, term regex, bullet/section helpers
-│   ├── docx.js               # dependency-free DOCX reader (ZIP + word/document.xml)
-│   ├── pdf.js                # dependency-free PDF text parser (Tj/TJ, Flate streams)
-│   └── extract.js            # format dispatcher + optional pdf-parse/mammoth adapters
-├── samples/                  # two sample resumes with matching job ads
-├── scripts/api-smoke.js      # end-to-end API test
-└── tests/                    # node:test unit tests (services.test.js covers the strict boot)
-```
+🚀 **Live Demo:** [https://resume-analyzer-mzm8-git-main-samiul1288s-projects.vercel.app](https://resume-analyzer-mzm8-git-main-samiul1288s-projects.vercel.app)
 
 ---
 
@@ -92,9 +13,9 @@ the first statement of `server.js`. Copy `.env.example` to `.env`; `.env` is git
 
 ### Browser authentication
 
-The login and registration screens use Firebase email/password and Google authentication. In the Firebase
-console, enable **Authentication -> Sign-in method -> Email/Password** and **Google**, and add your local
-or deployed host to the authorized domains. The browser loads the public Firebase web-app config from
+The login and registration screens use Firebase email/password authentication. In the Firebase
+console, enable **Authentication -> Sign-in method -> Email/Password** for the same project used
+by the `FIREBASE_*` settings. The browser loads the public Firebase web-app config from
 `GET /api/firebase-config`; this endpoint never returns MongoDB credentials or other server
 secrets. The analyzer UI is shown only while Firebase reports a signed-in user.
 
