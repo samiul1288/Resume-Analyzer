@@ -601,7 +601,7 @@ main.wrap {
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 6px 14px rgba(99, 102, 241, 0.45));
+  filter: drop-shadow(0 6px 14px var(--brand-glow, rgba(99, 102, 241, 0.45)));
 }
 .dz-sub {
   color: var(--muted);
@@ -1071,7 +1071,7 @@ textarea.input-area:focus {
   font-weight: 700;
   display: grid;
   place-items: center;
-  box-shadow: 0 6px 14px -6px rgba(99, 102, 241, 0.8);
+  box-shadow: var(--brand-glow, 0 6px 14px -6px rgba(99, 102, 241, 0.8));
 }
 
 /* -------------------------------- bars ---------------------------------- */
@@ -1290,7 +1290,7 @@ textarea.input-area:focus {
   display: grid;
   place-items: center;
   margin-top: 1px;
-  box-shadow: 0 6px 14px -6px rgba(99, 102, 241, 0.8);
+  box-shadow: var(--brand-glow, 0 6px 14px -6px rgba(99, 102, 241, 0.8));
 }
 .sev-tag {
   flex: 0 0 auto;

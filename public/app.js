@@ -930,7 +930,7 @@
     }
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta)
-      meta.setAttribute("content", theme === "dark" ? "#070a16" : "#e9edf8");
+      meta.setAttribute("content", theme === "dark" ? "#0a0f1d" : "#e9edf8");
   }
 
   function initTheme() {
