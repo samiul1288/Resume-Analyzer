@@ -17,6 +17,8 @@ const message = document.getElementById("auth-message");
 const loginTab = document.getElementById("auth-login-tab");
 const registerTab = document.getElementById("auth-register-tab");
 const signOutButton = document.getElementById("sign-out-btn");
+const googleButton = document.getElementById("auth-google");
+const googleLabel = document.getElementById("auth-google-label");
 
 let mode = "login";
 let auth = null;
@@ -46,8 +48,8 @@ function setMode(nextMode) {
     : "Welcome back";
   document.getElementById("auth-form-description").textContent = registering
     ? "Set up your account to open your resume workspace."
-    : "Use your email and password to sign in.";
-  submitLabel.textContent = registering ? "Create account" : "Sign in";
+    : "Use your email and password to log in.";
+  submitLabel.textContent = registering ? "Create Account" : "Login";
   showMessage("");
 }
 
@@ -56,17 +58,17 @@ function setBusy(nextBusy, label) {
   submitButton.disabled = busy || !auth;
   loginTab.disabled = busy;
   registerTab.disabled = busy;
+  googleButton.disabled = busy || !authActions;
   spinner.hidden = !busy;
   if (label) submitLabel.textContent = label;
   else
-    submitLabel.textContent =
-      mode === "register" ? "Create account" : "Sign in";
+    submitLabel.textContent = mode === "register" ? "Create Account" : "Login";
 }
 
 function authErrorMessage(error) {
   const messages = {
     "auth/email-already-in-use":
-      "An account already exists for this email. Sign in instead.",
+      "An account already exists for this email. Log in instead.",
     "auth/invalid-credential": "The email or password is incorrect.",
     "auth/invalid-email": "Enter a valid email address.",
     "auth/weak-password": "Choose a password with at least 6 characters.",
@@ -74,7 +76,15 @@ function authErrorMessage(error) {
     "auth/network-request-failed":
       "Could not reach Firebase. Check your connection and try again.",
     "auth/operation-not-allowed":
-      "Email and password sign-in is not enabled for this Firebase project.",
+      "This sign-in method is not enabled for this Firebase project.",
+    "auth/popup-closed-by-user":
+      "Google sign-in was cancelled. Try again when ready.",
+    "auth/popup-blocked":
+      "Your browser blocked the Google sign-in popup. Allow popups and try again.",
+    "auth/unauthorized-domain":
+      "This domain is not authorized for Firebase sign-in. Add it in Firebase Authentication settings.",
+    "auth/account-exists-with-different-credential":
+      "An account already exists with this email. Log in using its original sign-in method.",
   };
   return (
     messages[error.code] ||
@@ -87,7 +97,7 @@ async function submitAuth(event) {
   event.preventDefault();
   if (busy || !authActions) return;
   showMessage("");
-  setBusy(true, mode === "register" ? "Creating account..." : "Signing in...");
+  setBusy(true, mode === "register" ? "Creating account..." : "Logging in...");
 
   try {
     const email = emailInput.value.trim();
@@ -160,6 +170,22 @@ async function initializeAuth() {
   setBusy(false);
 }
 
+async function signInWithGoogle() {
+  if (busy || !authActions) return;
+  showMessage("");
+  setBusy(true);
+  googleLabel.textContent = "Connecting to Google...";
+  try {
+    const provider = new authActions.GoogleAuthProvider();
+    await authActions.signInWithPopup(auth, provider);
+  } catch (error) {
+    showMessage(authErrorMessage(error));
+  } finally {
+    googleLabel.textContent = "Sign in with Google";
+    setBusy(false);
+  }
+}
+
 loginTab.addEventListener("click", function () {
   if (!busy) setMode("login");
 });
@@ -167,6 +193,7 @@ registerTab.addEventListener("click", function () {
   if (!busy) setMode("register");
 });
 form.addEventListener("submit", submitAuth);
+googleButton.addEventListener("click", signInWithGoogle);
 signOutButton.addEventListener("click", async function () {
   if (!authActions || busy) return;
   signOutButton.disabled = true;

@@ -116,6 +116,17 @@ test("auth UI wires Firebase config, sign-in, registration, and sign-out states"
   assert.match(auth, /\/api\/firebase-config/);
   assert.match(auth, /createUserWithEmailAndPassword/);
   assert.match(auth, /signInWithEmailAndPassword/);
+  assert.match(html, /id="auth-google"/);
+  assert.match(html, /Sign in with Google/);
+  assert.match(html, /id="auth-submit-label">Login</);
+  assert.match(html, /Create Account/);
+  assert.match(html, /class="google-logo"/);
+  assert.match(auth, /GoogleAuthProvider/);
+  assert.match(auth, /signInWithPopup/);
+  assert.match(
+    auth,
+    /googleButton\.addEventListener\("click", signInWithGoogle\)/,
+  );
   assert.match(auth, /authActions\.signOut/);
   assert.match(auth, /onAuthStateChanged/);
   assert.match(auth, /resume-analyzer:signout/);

@@ -92,9 +92,9 @@ the first statement of `server.js`. Copy `.env.example` to `.env`; `.env` is git
 
 ### Browser authentication
 
-The login and registration screens use Firebase email/password authentication. In the Firebase
-console, enable **Authentication -> Sign-in method -> Email/Password** for the same project used
-by the `FIREBASE_*` settings. The browser loads the public Firebase web-app config from
+The login and registration screens use Firebase email/password and Google authentication. In the Firebase
+console, enable **Authentication -> Sign-in method -> Email/Password** and **Google**, and add your local
+or deployed host to the authorized domains. The browser loads the public Firebase web-app config from
 `GET /api/firebase-config`; this endpoint never returns MongoDB credentials or other server
 secrets. The analyzer UI is shown only while Firebase reports a signed-in user.
 
